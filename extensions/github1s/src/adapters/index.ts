@@ -25,7 +25,7 @@ export const registerAdapters = async (): Promise<void> => {
 		adapterManager.registerAdapter(new GitLab1sAdapter()),
 		adapterManager.registerAdapter(new BitbucketAdapter()),
 		adapterManager.registerAdapter(new Npmjs1sAdapter()),
-		adapterManager.registerAdapter(new OSSInsightAdapter()),
+		// adapterManager.registerAdapter(new OSSInsightAdapter()),
 	]);
 };
 

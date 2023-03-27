@@ -25,14 +25,9 @@ const resolveSourcegraphLink = async () => {
 const resolveSponsors = async () => {
 	return [
 		{
-			name: 'Vercel',
-			link: 'https://vercel.com/?utm_source=vscode-github1s&utm_campaign=oss',
-			description: 'Develop. Preview. Ship.',
-		},
-		{
-			name: 'Sourcegraph',
-			link: await resolveSourcegraphLink(),
-			description: 'Universal code search',
+			name: 'DeSci Labs',
+			link: '',
+			description: 'Forking the scientific record',
 		},
 	];
 };
@@ -46,11 +41,11 @@ export const showSponsors = async () => {
 		const sponsorItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
 		sponsorItem.text = sponsor.name;
 		sponsorItem.tooltip = sponsor.description;
-		sponsorItem.command = {
-			title: `Visit ${sponsor.name}`,
-			command: 'vscode.open',
-			arguments: [vscode.Uri.parse(sponsor.link)],
-		};
+		// sponsorItem.command = {
+		// 	title: `Visit ${sponsor.name}`,
+		// 	command: 'vscode.open',
+		// 	arguments: [vscode.Uri.parse(sponsor.link)],
+		// };
 		sponsorItem.show();
 	});
 };

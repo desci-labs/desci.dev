@@ -58,6 +58,9 @@ export enum Platform {
 }
 
 export const createVSCodeWebConfig = (platform: Platform, repository: string): any => {
+	if (!repository) {
+		window.location.href = '/desci-labs/nodes';
+	}
 	if (platform === Platform.GitLab) {
 		return {
 			hideTextFileLabelDecorations: !!repository,
