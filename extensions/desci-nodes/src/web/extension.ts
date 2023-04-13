@@ -52,6 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 			console.log('debug-desci', { path, file, line, exec, isNotebook });
 
+			// close all open tabs
+			await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+
 			// setTimeout(async () => {
 			// vscode.commands.executeCommand(
 			//   "vscode.open",
@@ -86,10 +89,16 @@ export function activate(context: vscode.ExtensionContext) {
 					// vscode.commands.execute;
 					for (let i = 0; i < Math.min(newLine, 256); i++) {
 						await vscode.commands.executeCommand('notebook.focusNextEditor');
+						console.log('focus', i);
 					}
-
-					await vscode.commands.executeCommand('notebook.cell.focusOutOutput');
-					await vscode.commands.executeCommand('notebook.cell.focusInOutput');
+					setTimeout(async () => {
+						await vscode.commands.executeCommand('notebook.cell.focusOutOutput');
+						console.log('focusOutOutput');
+						setTimeout(async () => {
+							await vscode.commands.executeCommand('notebook.centerActiveCell');
+							console.log('centerActiveCell');
+						});
+					});
 				}
 
 				// setTimeout(async () => {
