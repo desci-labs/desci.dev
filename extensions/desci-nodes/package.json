@@ -2,7 +2,7 @@
   "name": "desci-nodes",
   "displayName": "desci-nodes",
   "description": "DeSci Nodes Helper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "desci-labs",
   "repository": "https://github.com/desci-labs/desci-nodes-vscode",
   "engines": {
