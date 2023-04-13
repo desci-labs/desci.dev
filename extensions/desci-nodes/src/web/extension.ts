@@ -29,15 +29,19 @@ export function activate(context: vscode.ExtensionContext) {
 
 	setInterval(async () => {
 		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
-		debugger;
+		// debugger;
 		if (out != lastUrl) {
 			lastUrl = out;
 			function getParameterByName(name: string) {
 				name = name.replace(/[\[\]]/g, '\\$&');
 				var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
 					results = regex.exec(out);
-				if (!results) {return null;}
-				if (!results[2]) {return '';}
+				if (!results) {
+					return null;
+				}
+				if (!results[2]) {
+					return '';
+				}
 				return decodeURIComponent(results[2].replace(/\+/g, ' '));
 			}
 			const path = getParameterByName('folder');
