@@ -81,12 +81,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 				if (line) {
 					console.log('GOT LINE', line);
-					const newLine = parseInt(line);
+					const newLine = parseInt(line) - 1;
 					console.log('NEWLINE', newLine);
 					// const range = new vscode.NotebookRange(newLine - 1, newLine);
 					// st.revealRange(range);
 					// st.selections = [new vscode.NotebookRange(newLine - 1, newLine)];
 					// vscode.commands.execute;
+					await vscode.commands.executeCommand('notebook.focusTop');
+					// await vscode.commands.executeCommand('notebook.centerActiveCell');
 					for (let i = 0; i < Math.min(newLine, 256); i++) {
 						await vscode.commands.executeCommand('notebook.focusNextEditor');
 						console.log('focus', i);
