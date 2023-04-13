@@ -25,16 +25,15 @@ export function activate(context: vscode.ExtensionContext) {
 	// );
 
 	// vscode.commands.executeCommand("vscode.")
-	// debugger;
 
 	setInterval(async () => {
 		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
-		// debugger;
 		if (out != lastUrl) {
+			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
 			function getParameterByName(name: string) {
 				name = name.replace(/[\[\]]/g, '\\$&');
-				var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+				var regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
 					results = regex.exec(out);
 				if (!results) {
 					return null;
@@ -49,14 +48,16 @@ export function activate(context: vscode.ExtensionContext) {
 			const line = getParameterByName('line');
 			const exec = getParameterByName('exec');
 
-			console.log('debug-desci', { path, file, line, exec });
+			const isNotebook = file && file.indexOf('.ipynb') > -1;
+
+			console.log('debug-desci', { path, file, line, exec, isNotebook });
 
 			// setTimeout(async () => {
 			// vscode.commands.executeCommand(
 			//   "vscode.open",
 			//   `file://${path}/requirements.txt`
 			// );
-			if (file && file.indexOf('.ipynb') > -1) {
+			if (isNotebook) {
 				const a = await vscode.workspace.findFiles('*');
 				const notebookUri = vscode.Uri.parse(
 					`${a[a.length - 1].scheme || 'vscode-remote'}:/${a[a.length - 1].authority}${[path, file]
@@ -68,7 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
 					// vscode.Uri.parse(`vscode-remote://${file}`)
 				);
 				const st = await vscode.window.showNotebookDocument(s);
-				await vscode.commands.executeCommand('notebook.clearAllCellsOutputs');
+				// await vscode.commands.executeCommand('notebook.clearAllCellsOutputs');
 				// await vscode.commands.executeCommand("notebook.focusBottom");
 				// if (exec) {
 				//   await vscode.commands.executeCommand("notebook.clearAllCellsOutputs");
@@ -79,8 +80,13 @@ export function activate(context: vscode.ExtensionContext) {
 					console.log('GOT LINE', line);
 					const newLine = parseInt(line);
 					console.log('NEWLINE', newLine);
-					const range = new vscode.NotebookRange(newLine - 1, newLine);
-					st.revealRange(range);
+					// const range = new vscode.NotebookRange(newLine - 1, newLine);
+					// st.revealRange(range);
+					// st.selections = [new vscode.NotebookRange(newLine - 1, newLine)];
+					// vscode.commands.execute;
+					for (let i = 0; i < Math.min(newLine, 256); i++) {
+						await vscode.commands.executeCommand('notebook.focusNextEditor');
+					}
 				}
 
 				// setTimeout(async () => {
@@ -116,7 +122,7 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			}
 		}
-	}, 1000);
+	}, 10);
 
 	// vscode.commands.executeCommand("calicoColors.colorsView.focus");
 
