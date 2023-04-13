@@ -87,7 +87,9 @@ export function activate(context: vscode.ExtensionContext) {
 					for (let i = 0; i < Math.min(newLine, 256); i++) {
 						await vscode.commands.executeCommand('notebook.focusNextEditor');
 					}
+
 					await vscode.commands.executeCommand('notebook.cell.focusOutOutput');
+					await vscode.commands.executeCommand('notebook.cell.focusInOutput');
 				}
 
 				// setTimeout(async () => {
