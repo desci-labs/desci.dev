@@ -52,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			console.log('debug-desci', { path, file, line, exec, isNotebook });
 
-			if (!path) {
+			if (!file) {
 				return;
 			}
 			// close all open tabs
