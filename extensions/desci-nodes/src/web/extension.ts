@@ -52,6 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 			console.log('debug-desci', { path, file, line, exec, isNotebook });
 
+			if (!path) {
+				return;
+			}
 			// close all open tabs
 			await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
