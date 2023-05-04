@@ -31,7 +31,7 @@ const createConfigurationDefaults = (disableSomeAnyCodeFeatures: boolean) => {
 	const configurationDefaults = {
 		'workbench.colorTheme': 'Default Dark+',
 		'telemetry.telemetryLevel': 'off',
-		'workbench.startupEditor': 'readme',
+		'workbench.startupEditor': 'none',
 	} as Record<string, any>;
 
 	// disable some anycode features when we can use sourcegraph instead

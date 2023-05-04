@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 			// close all open tabs
-			await vscode.commands.executeCommand('workbench.action.closeAllEditors');
+			//await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
 			// setTimeout(async () => {
 			// vscode.commands.executeCommand(
