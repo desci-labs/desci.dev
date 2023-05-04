@@ -22,6 +22,10 @@ const handleRouterOnActiveEditorChange = async (editor: vscode.TextEditor | unde
 		return;
 	}
 
+	/** stop loading so much if switching files from Nodes */
+	if ((await router.getPath()).indexOf('#file') > -1) {
+		return;
+	}
 	// if the file which not belong to current workspace is opened, or no file
 	// is opened, only retain `repo` (and `ref` if need) in browser url
 	if (!activeFileUri || activeFileUri?.authority || activeFileUri?.scheme !== adapterManager.getCurrentScheme()) {
@@ -57,7 +61,10 @@ const handleRouterOnTextEditorSelectionChange = async (editor: vscode.TextEditor
 	if (pageType !== PageType.Blob || !editor?.selection) {
 		return;
 	}
-
+	/** stop loading so much if switching files from Nodes */
+	if ((await router.getPath()).indexOf('#file') > -1) {
+		return;
+	}
 	const activeFileUri = editor?.document.uri;
 	const browserPath = await routerParser.buildBlobPath(
 		repo,

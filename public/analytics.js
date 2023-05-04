@@ -1,12 +1,5 @@
 (function () {
-	const mid = 'G-D3LJNF4DN0';
-	if (window.location.hostname.match(/\.?gitlab1s\.com$/i)) {
-		mid = 'G-1F70ST6944';
-	} else if (window.location.hostname.match(/\.?bitbucket1s\.org$/i)) {
-		mid = 'G-SPWSR3V6YC';
-	} else if (window.location.hostname.match(/\.?npmjs1s\.com$/i)) {
-		mid = 'G-VF4VCXYFKV';
-	}
+	const mid = 'G-02ECH7KGWR';
 	window.dataLayer = window.dataLayer || [];
 	function gtag() {
 		dataLayer.push(arguments);
