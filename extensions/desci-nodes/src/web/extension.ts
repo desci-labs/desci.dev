@@ -26,28 +26,39 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// vscode.commands.executeCommand("vscode.")
 
+	function getParameterByName(url: string, name: string) {
+		name = name.replace(/[\[\]]/g, '\\$&');
+		var regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
+			results = regex.exec(url);
+		if (!results) {
+			return null;
+		}
+		if (!results[2]) {
+			return '';
+		}
+		return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	}
+	(async () => {
+		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
+		const sidePanel = getParameterByName(out, 'panel');
+		if (sidePanel === '0') {
+			vscode.commands.executeCommand('workbench.action.closeSidebar');
+		} else if (sidePanel === '1') {
+			vscode.commands.executeCommand('workbench.files.action.showActiveFileInExplorer');
+		}
+	})();
+
 	setInterval(async () => {
 		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
 		if (out !== lastUrl) {
 			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
-			function getParameterByName(name: string) {
-				name = name.replace(/[\[\]]/g, '\\$&');
-				var regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
-					results = regex.exec(out);
-				if (!results) {
-					return null;
-				}
-				if (!results[2]) {
-					return '';
-				}
-				return decodeURIComponent(results[2].replace(/\+/g, ' '));
-			}
-			const path = getParameterByName('folder');
-			const file = getParameterByName('file');
-			const line = getParameterByName('line');
-			const exec = getParameterByName('exec');
-			const sidePanel = getParameterByName('panel');
+
+			const path = getParameterByName(out, 'folder');
+			const file = getParameterByName(out, 'file');
+			const line = getParameterByName(out, 'line');
+			const exec = getParameterByName(out, 'exec');
+			const sidePanel = getParameterByName(out, 'panel');
 
 			const isNotebook = file && file.indexOf('.ipynb') > -1;
 
