@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	setInterval(async () => {
 		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
-		if (out != lastUrl) {
+		if (out !== lastUrl) {
 			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
 			function getParameterByName(name: string) {
@@ -47,10 +47,17 @@ export function activate(context: vscode.ExtensionContext) {
 			const file = getParameterByName('file');
 			const line = getParameterByName('line');
 			const exec = getParameterByName('exec');
+			const sidePanel = getParameterByName('panel');
 
 			const isNotebook = file && file.indexOf('.ipynb') > -1;
 
-			console.log('debug-desci', { path, file, line, exec, isNotebook });
+			console.log('debug-desci', { path, file, line, exec, isNotebook, sidePanel });
+
+			if (sidePanel === '0') {
+				vscode.commands.executeCommand('workbench.action.closeSidebar');
+			} else if (sidePanel === '1') {
+				vscode.commands.executeCommand('workbench.files.action.showActiveFileInExplorer');
+			}
 
 			if (!file) {
 				return;
