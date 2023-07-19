@@ -31,7 +31,7 @@ const createConfigurationDefaults = (disableSomeAnyCodeFeatures: boolean) => {
 	const configurationDefaults = {
 		'workbench.colorTheme': 'Default Dark+',
 		'telemetry.telemetryLevel': 'off',
-		'workbench.startupEditor': 'readme',
+		'workbench.startupEditor': 'none',
 	} as Record<string, any>;
 
 	// disable some anycode features when we can use sourcegraph instead
@@ -58,6 +58,9 @@ export enum Platform {
 }
 
 export const createVSCodeWebConfig = (platform: Platform, repository: string): any => {
+	if (!repository) {
+		window.location.href = '/desci-labs/nodes';
+	}
 	if (platform === Platform.GitLab) {
 		return {
 			hideTextFileLabelDecorations: !!repository,
