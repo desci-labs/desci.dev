@@ -102,6 +102,9 @@
 #workbench\.parts\.sidebar {
 	display: none !important;
 }
+.left-items.items-container {
+	visibility: hidden;
+}
 /* .part.activitybar.left {
 	display: none !important;
 }
