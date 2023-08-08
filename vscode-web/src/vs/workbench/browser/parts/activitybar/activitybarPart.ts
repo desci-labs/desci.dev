@@ -464,7 +464,7 @@ export class ActivitybarPart extends Part implements IPaneCompositeSelectorPart 
 
 		// below codes are changed by github1s
 		if (window?.vscodeWeb?.logo) {
-			this.createHomeBar();
+			// this.createHomeBar();
 		}
 		// above codes are changed by github1s
 
@@ -526,44 +526,44 @@ export class ActivitybarPart extends Part implements IPaneCompositeSelectorPart 
 
 	// below codes are changed by github1s
 	private createHomeBar(): void {
-		const logo = window?.vscodeWeb?.logo as { icon?: string; title?: string; onClick?: () => void } | undefined;
+		// const logo = window?.vscodeWeb?.logo as { icon?: string; title?: string; onClick?: () => void } | undefined;
 
-		this.homeBarContainer = document.createElement('div');
-		this.homeBarContainer.setAttribute('aria-label', logo?.title || 'Home');
-		this.homeBarContainer.setAttribute('role', 'toolbar');
-		this.homeBarContainer.classList.add('home-bar');
+		// this.homeBarContainer = document.createElement('div');
+		// this.homeBarContainer.setAttribute('aria-label', logo?.title || 'Home');
+		// this.homeBarContainer.setAttribute('role', 'toolbar');
+		// this.homeBarContainer.classList.add('home-bar');
 
-		if (logo?.onClick) {
-			this.homeBarContainer.classList.add('home-bar-clickable');
-		}
+		// if (logo?.onClick) {
+		// 	this.homeBarContainer.classList.add('home-bar-clickable');
+		// }
 
-		const homeBar = this._register(new ActionBar(this.homeBarContainer, {
-			actionViewItemProvider: action => this.instantiationService.createInstance(HomeActivityActionViewItem, action as ActivityAction, (theme: IColorTheme) => this.getActivitybarItemColors(theme), this.getActivityHoverOptions()),
-			orientation: ActionsOrientation.VERTICAL,
-			ariaLabel: logo?.title || 'Home',
-			animated: false,
-			preventLoopNavigation: true,
-		}));
+		// const homeBar = this._register(new ActionBar(this.homeBarContainer, {
+		// 	actionViewItemProvider: action => this.instantiationService.createInstance(HomeActivityActionViewItem, action as ActivityAction, (theme: IColorTheme) => this.getActivitybarItemColors(theme), this.getActivityHoverOptions()),
+		// 	orientation: ActionsOrientation.VERTICAL,
+		// 	ariaLabel: logo?.title || 'Home',
+		// 	animated: false,
+		// 	preventLoopNavigation: true,
+		// }));
 
-		const iconClasses = logo?.icon ? 'home-bar-custom-icon' : '';
+		// const iconClasses = logo?.icon ? 'home-bar-custom-icon' : '';
 
-		homeBar.push(this._register(new ActivityAction({
-			id: 'workbench.actions.home',
-			name: logo?.title || 'Home',
-			cssClass: iconClasses,
-		})));
+		// homeBar.push(this._register(new ActivityAction({
+		// 	id: 'workbench.actions.home',
+		// 	name: logo?.title || 'Home',
+		// 	cssClass: iconClasses,
+		// })));
 
-		const content = assertIsDefined(this.content);
-		content.appendChild(this.homeBarContainer);
-		// set custom logo
-		if (logo?.icon) {
-			const iconElement = this.homeBarContainer.querySelector('.home-bar-custom-icon') as HTMLElement;
-			if (iconElement?.style) {
-				const logoImage = `url(${window.encodeURI(logo?.icon)})`
-				iconElement.style.maskImage = logoImage;
-				iconElement.style.webkitMaskImage = logoImage;
-			}
-		}
+		// const content = assertIsDefined(this.content);
+		// content.appendChild(this.homeBarContainer);
+		// // set custom logo
+		// if (logo?.icon) {
+		// 	const iconElement = this.homeBarContainer.querySelector('.home-bar-custom-icon') as HTMLElement;
+		// 	if (iconElement?.style) {
+		// 		const logoImage = `url(${window.encodeURI(logo?.icon)})`
+		// 		iconElement.style.maskImage = logoImage;
+		// 		iconElement.style.webkitMaskImage = logoImage;
+		// 	}
+		// }
 	}
 	// above codes are changed by github1s
 

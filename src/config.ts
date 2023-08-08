@@ -3,7 +3,7 @@
  * @author netcon
  */
 
-import githubLogoUrl from './assets/github.svg';
+// import githubLogoUrl from './assets/github.svg';
 import gitlabLogoUrl from './assets/gitlab.svg';
 import bitbucketLogoUrl from './assets/bitbucket.svg';
 import npmLogoUrl from './assets/npm.svg';
@@ -119,9 +119,9 @@ export const createVSCodeWebConfig = (platform: Platform, repository: string): a
 		workspaceId: !isOnlineEditor ? 'github1s:' + (repository || 'trending') : '',
 		workspaceLabel: repository || (isOnlineEditor ? '' : 'GitHub Trending'),
 		logo: {
-			title: 'Open on GitHub',
-			icon: githubLogoUrl,
-			onClick: () => (repository ? openOfficialPage('https://github.com') : openGitHub1sPage()),
+			// title: 'Open on GitHub',
+			// icon: githubLogoUrl,
+			// onClick: () => (repository ? openOfficialPage('https://github.com') : openGitHub1sPage()),
 		},
 	};
 };

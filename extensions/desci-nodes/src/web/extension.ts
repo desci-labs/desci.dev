@@ -41,11 +41,11 @@ export function activate(context: vscode.ExtensionContext) {
 	(async () => {
 		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
 		const sidePanel = getParameterByName(out, 'panel');
-		if (sidePanel === '0') {
-			vscode.commands.executeCommand('workbench.action.closeSidebar');
-		} else if (sidePanel === '1') {
-			vscode.commands.executeCommand('workbench.files.action.showActiveFileInExplorer');
-		}
+		// if (sidePanel === '0') {
+		// 	vscode.commands.executeCommand('workbench.action.closeSidebar');
+		// } else if (sidePanel === '1') {
+		// 	vscode.commands.executeCommand('workbench.files.action.showActiveFileInExplorer');
+		// }
 	})();
 
 	setInterval(async () => {

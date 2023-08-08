@@ -118,6 +118,8 @@ const PAGE_TYPE_MAP = {
 };
 
 export const parseGitHubPath = async (path: string): Promise<RouterState> => {
+	// remove /vscode prefix from path
+	path = path.replace(/^\/vscode/, '');
 	const pathParts = parsePath(path).pathname?.split('/').filter(Boolean) || [];
 	// detect concrete PageType the *third part* in url.path
 	const pageType = pathParts[2] ? PAGE_TYPE_MAP[pathParts[2]] || PageType.Unknown : PageType.Tree;

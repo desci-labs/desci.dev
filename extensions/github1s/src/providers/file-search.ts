@@ -59,7 +59,6 @@ export class GitHub1sFileSearchProvider implements FileSearchProvider, Disposabl
 		if (this.fileUrisMap.has(authority)) {
 			return this.fileUrisMap.get(authority)!;
 		}
-
 		const [repo, ref] = authority.split('+');
 		const currentAdapter = adapterManager.getCurrentAdapter();
 		const dataSource = await currentAdapter.resolveDataSource();
