@@ -2,29 +2,14 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import ColorsViewProvider from './ColorsViewProvider';
-// import ColorsViewProvider from "./ColorsViewProvider";
 
 let lastUrl = '';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "desci-nodes" is now active in the web extension host!');
-
-	// vscode
-	// setTimeout(() => {
-	//   vscode.commands.executeCommand("workbench.action.decreaseViewSize");
-	// }, 4000);
-
-	// vscode.commands.executeCommand(
-	//   "vscode.open",
-	//   vscode.Uri.parse(
-	//     "https://ipfs.desci.com/ipfs/bafkreien5tefogkg2tgxbibesspagorkfjkdo77j6ha3srgcb6pocgu6ke"
-	//   )
-	// );
-
-	// vscode.commands.executeCommand("vscode.")
 
 	function getParameterByName(url: string, name: string) {
 		name = name.replace(/[\[\]]/g, '\\$&');
@@ -38,21 +23,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		return decodeURIComponent(results[2].replace(/\+/g, ' '));
 	}
-	(async () => {
-		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
-		const sidePanel = getParameterByName(out, 'panel');
-		// if (sidePanel === '0') {
-		// 	vscode.commands.executeCommand('workbench.action.closeSidebar');
-		// } else if (sidePanel === '1') {
-		// 	vscode.commands.executeCommand('workbench.files.action.showActiveFileInExplorer');
-		// }
-	})();
 
 	setInterval(async () => {
-		const out: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserUrl');
+		const out: string = await vscode.commands.executeCommand('desci.commands.vscode.check');
 		if (out !== lastUrl) {
 			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
+			await vscode.commands.executeCommand('github1s.commands.vscode.replaceBrowserUrl', lastUrl);
+			// await vscode.commands.executeCommand('desci.commands.vscode.clear');
 
 			const path = getParameterByName(out, 'folder');
 			const file = getParameterByName(out, 'file');
@@ -73,14 +51,6 @@ export function activate(context: vscode.ExtensionContext) {
 			if (!file) {
 				return;
 			}
-			// close all open tabs
-			//await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-
-			// setTimeout(async () => {
-			// vscode.commands.executeCommand(
-			//   "vscode.open",
-			//   `file://${path}/requirements.txt`
-			// );
 			if (isNotebook) {
 				const a = await vscode.workspace.findFiles('*');
 				const notebookUri = vscode.Uri.parse(
@@ -92,13 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 					notebookUri
 					// vscode.Uri.parse(`vscode-remote://${file}`)
 				);
-				const st = await vscode.window.showNotebookDocument(s);
-				// await vscode.commands.executeCommand('notebook.clearAllCellsOutputs');
-				// await vscode.commands.executeCommand("notebook.focusBottom");
-				// if (exec) {
-				//   await vscode.commands.executeCommand("notebook.clearAllCellsOutputs");
-				//   await vscode.commands.executeCommand("notebook.execute", notebookUri);
-				// }
+				await vscode.window.showNotebookDocument(s);
 
 				if (line) {
 					console.log('GOT LINE', line);
@@ -123,13 +87,6 @@ export function activate(context: vscode.ExtensionContext) {
 						});
 					});
 				}
-
-				// setTimeout(async () => {
-				//   await vscode.commands.executeCommand(
-				//     "notebook.execute",
-				//     vscode.Uri.parse(`vscode-remote://${file}`)
-				//   );
-				// }, 5000);
 			} else if (file) {
 				const a = await vscode.workspace.findFiles('*');
 				console.log('A', a);
@@ -159,35 +116,25 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}, 10);
 
-	// vscode.commands.executeCommand("calicoColors.colorsView.focus");
+	// // The command has been defined in the package.json file
+	// // Now provide the implementation of the command with registerCommand
+	// // The commandId parameter must match the command field in package.json
+	// let disposable = vscode.commands.registerCommand('helloworld-web-sample.helloWorld', () => {
+	// 	// The code you place here will be executed every time your command is executed
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('helloworld-web-sample.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+	// 	// Display a message box to the user
+	// 	vscode.window.showInformationMessage('Hello World from helloworld-web-sample in a web extension host!');
+	// });
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from helloworld-web-sample in a web extension host!');
-	});
-
-	context.subscriptions.push(disposable);
+	// context.subscriptions.push(disposable);
 
 	const provider = new ColorsViewProvider(context.extensionUri);
 
-	context.subscriptions.push(vscode.window.registerWebviewViewProvider(ColorsViewProvider.viewType, provider));
-
-	context.subscriptions.push(
-		vscode.commands.registerCommand('calicoColors.addColor', () => {
-			provider.addColor();
-		})
-	);
-
-	context.subscriptions.push(
-		vscode.commands.registerCommand('calicoColors.clearColors', () => {
-			provider.clearColors();
-		})
-	);
+	// context.subscriptions.push(vscode.window.registerWebviewViewProvider(ColorsViewProvider.viewType, provider));
+	// context.subscriptions.push(
+	// 	// vscode.window.createWebviewPanel(ColorsViewProvider.viewType, 'desci', vscode.ViewColumn.One, {})
+	// 	vscode.window.registerWebviewViewProvider(ColorsViewProvider.viewType, provider)
+	// );
 }
 
 // this method is called when your extension is deactivated

@@ -63,6 +63,18 @@ const resolvePlatformState = (): [Platform, string] => {
 		{ id: 'github1s.commands.vscode.replaceBrowserUrl', handler: (url: string) => history.replaceState(null, '', url) },
 		{ id: 'github1s.commands.vscode.pushBrowserUrl', handler: (url: string) => history.pushState(null, '', url) },
 		{ id: 'github1s.commands.vscode.connectToGitHub', handler: ConnectToGitHub },
+		{
+			id: 'desci.commands.vscode.check',
+			handler: () => window.localStorage.getItem('desci.url'),
+		},
+		{
+			id: 'desci.commands.vscode.clear',
+			handler: () => window.localStorage.setItem('desci.url', ''),
+		},
+		{
+			id: 'desci.commands.vscode.activate',
+			handler: (handle: any) => window.addEventListener('message', handle),
+		},
 	];
 
 	(window as any).vscodeWeb = {

@@ -52,8 +52,8 @@ const initialVSCodeState = async () => {
 	const scheme = adapterManager.getCurrentScheme();
 	const config = vscode.workspace.getConfiguration();
 	config.update('workbench.activityBar.visible', false, true);
-	config.update('workbench.explorer.fileVew.visible', false, true);
-	config.update('workbench.explorer.autoReveal', false, true);
+	// config.update('workbench.explorer.fileVew.visible', false, true);
+	// config.update('workbench.explorer.autoReveal', false, true);
 	vscode.commands.executeCommand('workbench.action.closeSidebar');
 	if (routerState.pageType === PageType.Tree && routerState.filePath) {
 		vscode.commands.executeCommand(
