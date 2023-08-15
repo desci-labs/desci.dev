@@ -75,6 +75,16 @@ module.exports = (env, argv) => {
 						to: `static-${STATIC_HASH}/extensions`,
 						...skipMinified,
 					},
+					// !devVscode && {
+					// 	from: 'vscode-web/src/vs/workbench/services/extensions/worker/webWorkerExtensionHostIframe.html',
+					// 	to: `static-${STATIC_HASH}/vscode/vs/workbench/services/extensions/worker/webWorkerExtensionHostIframe.html`,
+					// 	...skipMinified,
+					// },
+					{
+						from: 'vscode-web/src/vs/workbench/contrib/webview/browser/pre/index-no-csp.html',
+						to: `static-${STATIC_HASH}/vscode/vs/workbench/contrib/webview/browser/pre/index-no-csp.html`,
+						...skipMinified,
+					},
 					...VSCODE_NODE_MODULES,
 				].filter(Boolean),
 			}),
