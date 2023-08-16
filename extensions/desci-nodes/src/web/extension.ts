@@ -29,6 +29,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (out !== lastUrl) {
 			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
+			// await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 			await vscode.commands.executeCommand('github1s.commands.vscode.replaceBrowserUrl', lastUrl);
 			// await vscode.commands.executeCommand('desci.commands.vscode.clear');
 
@@ -42,50 +43,145 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			console.log('debug-desci', { path, file, line, exec, isNotebook, sidePanel });
 
-			if (sidePanel === '0') {
-				vscode.commands.executeCommand('workbench.action.closeSidebar');
-			} else if (sidePanel === '1') {
-				vscode.commands.executeCommand('workbench.files.action.showActiveFileInExplorer');
-			}
+			// if (sidePanel === '0') {
+			// 	vscode.commands.executeCommand('workbench.action.closeSidebar');
+			// } else if (sidePanel === '1') {
+			// 	vscode.commands.executeCommand('workbench.files.action.showActiveFileInExplorer');
+			// }
 
 			if (!file) {
 				return;
 			}
 			if (isNotebook) {
-				const a = await vscode.workspace.findFiles('*');
-				const notebookUri = vscode.Uri.parse(
-					`${a[a.length - 1].scheme || 'vscode-remote'}:/${a[a.length - 1].authority}${[path, file]
-						.filter(Boolean)
-						.join('/')}`
-				);
-				const s = await vscode.workspace.openNotebookDocument(
-					notebookUri
-					// vscode.Uri.parse(`vscode-remote://${file}`)
-				);
-				await vscode.window.showNotebookDocument(s);
+				let shouldRetry = true;
+				const MAX_ATTEMPTS = 3;
+				let attempts = 0;
+				let notebookDocument: vscode.NotebookEditor | undefined;
+				while (shouldRetry && attempts < MAX_ATTEMPTS) {
+					let uri: string = 'nouri';
+					try {
+						const a = await vscode.workspace.findFiles('*');
+						uri = `${a[a.length - 1].scheme || 'vscode-remote'}:/${a[a.length - 1].authority}${[path, file]
+							.filter(Boolean)
+							.join('/')}`;
+						const notebookUri = vscode.Uri.parse(uri);
 
-				if (line) {
-					console.log('GOT LINE', line);
-					const newLine = parseInt(line) - 1;
-					console.log('NEWLINE', newLine);
+						const s = await vscode.workspace.openNotebookDocument(
+							notebookUri
+							// vscode.Uri.parse(`vscode-remote://${file}`)
+						);
+						// let selections:vscode.NotebookRange[] = [];
+						// if (line) {
+						// let newLine = parseInt(line);
+						// const notebookRange = new vscode.NotebookRange(newLine-1, newLine);
+						// selections=[notebookRange];
+						// }
+						notebookDocument = await vscode.window.showNotebookDocument(s);
+
+						shouldRetry = false;
+					} catch (err) {
+						console.error('CAUGHT');
+						console.error(err);
+						// await vscode.window.showInformationMessage(`attempt ${uri} ${attempts}: ${JSON.stringify(err)}`);
+						attempts++;
+					}
+				}
+
+				if (line && notebookDocument) {
+					// vscode.window.showInformationMessage('Loading Reproducibility');
+
+					setTimeout(async () => {
+						// vscode.window.showInformationMessage('did open');
+
+						console.log('GOT LINE', line);
+						const shiftKeys: { [k: string]: number } = {
+							make_table_01: 1,
+							make_table_02: 1,
+							make_table_03: 2,
+							plot_figure_06: 3,
+							plot_figure_07: 2,
+							plot_figure_08: 2,
+							plot_figure_02: -2,
+							make_table_04: 1,
+							plot_figure_10: 0,
+							none: 0,
+						};
+						const shiftRes = Object.keys(shiftKeys).find((k) => file.includes(k));
+						const shiftDown: number = shiftKeys[shiftRes ? shiftRes : 'none'];
+
+						let newLine = parseInt(line);
+						if (!shiftDown) {
+							newLine -= 1;
+						} else {
+							newLine += shiftDown;
+						}
+						console.log('NEWLINE', newLine);
+
+						const activeNotebook = vscode.window.activeNotebookEditor;
+						console.log(activeNotebook?.selection);
+						//   debugger
+
+						// vscode.window.showInformationMessage(`line: ${newLine}`);
+
+						// setTimeout(async () => {
+						// 	await vscode.commands.executeCommand(`workbench.action.openEditorAtIndex${newLine}`);
+						// }, 500);
+
+						await vscode.commands.executeCommand('notebook.focusTop');
+						setTimeout(async () => {
+							for (let i = 0; i < newLine + shiftDown; i++) {
+								await vscode.commands.executeCommand('notebook.focusNextEditor');
+							}
+
+							if (!shiftDown) {
+								await vscode.commands.executeCommand('notebook.focusPreviousEditor');
+							}
+
+							await vscode.commands.executeCommand('notebook.cell.collapseCellInput');
+							await vscode.commands.executeCommand('notebook.centerActiveCell');
+							await vscode.commands.executeCommand('notebook.cell.focusInOutput');
+
+							const notebookRange = new vscode.NotebookRange(newLine, newLine);
+							console.log('notebookRange', notebookRange);
+
+							// vscode.window.showInformationMessage(
+							// 	`range: ${JSON.stringify(notebookRange)} ${JSON.stringify(notebookDocument)}`
+							// );
+							notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.InCenter);
+							notebookDocument!.selection = notebookRange;
+							await vscode.commands.executeCommand('notebook.cell.collapseCellInput');
+							await vscode.commands.executeCommand('notebook.cell.focusInOutput');
+							// setTimeout(() => {
+							// 	vscode.commands.executeCommand('desci.commands.vscode.clear');
+							// }, 50);
+						}, 100);
+
+						// notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.AtTop);
+						// notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.InCenterIfOutsideViewport);
+						// notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.Default);
+						// notebookDocument!.selection = notebookRange;
+						// await vscode.commands.executeCommand('notebook.centerActiveCell');
+
+						// vscode.window.showInformationMessage('bye');
+					}, 1000);
 					// const range = new vscode.NotebookRange(newLine - 1, newLine);
 					// st.revealRange(range);
 					// st.selections = [new vscode.NotebookRange(newLine - 1, newLine)];
 					// vscode.commands.execute;
-					await vscode.commands.executeCommand('notebook.focusTop');
+					// await vscode.commands.executeCommand('notebook.focusTop');
 					// await vscode.commands.executeCommand('notebook.centerActiveCell');
-					for (let i = 0; i < Math.min(newLine, 256); i++) {
-						await vscode.commands.executeCommand('notebook.focusNextEditor');
-						console.log('focus', i);
-					}
-					setTimeout(async () => {
-						await vscode.commands.executeCommand('notebook.cell.focusOutOutput');
-						console.log('focusOutOutput');
-						setTimeout(async () => {
-							await vscode.commands.executeCommand('notebook.centerActiveCell');
-							console.log('centerActiveCell');
-						});
-					});
+					// for (let i = 0; i < Math.min(newLine, 256); i++) {
+					// 	await vscode.commands.executeCommand('notebook.focusNextEditor');
+					// 	console.log('focus', i);
+					// }
+					// setTimeout(async () => {
+					// 	await vscode.commands.executeCommand('notebook.cell.focusOutOutput');
+					// 	console.log('focusOutOutput');
+					// 	setTimeout(async () => {
+					// 		await vscode.commands.executeCommand('notebook.centerActiveCell');
+					// 		console.log('centerActiveCell');
+					// 	});
+					// });
 				}
 			} else if (file) {
 				const a = await vscode.workspace.findFiles('*');
