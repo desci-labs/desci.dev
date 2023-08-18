@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import ColorsViewProvider from './ColorsViewProvider';
 
 let lastUrl = '';
+let lastLine = '';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
@@ -26,16 +27,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	setInterval(async () => {
 		const out: string = await vscode.commands.executeCommand('desci.commands.vscode.check');
-		if (out !== lastUrl) {
+		const line = getParameterByName(out, 'line');
+		if (out !== lastUrl || line !== lastLine) {
 			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
+			lastLine = line || '';
 			// await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 			await vscode.commands.executeCommand('github1s.commands.vscode.replaceBrowserUrl', lastUrl);
 			// await vscode.commands.executeCommand('desci.commands.vscode.clear');
 
 			const path = getParameterByName(out, 'folder');
 			const file = getParameterByName(out, 'file');
-			const line = getParameterByName(out, 'line');
+
 			const exec = getParameterByName(out, 'exec');
 			const sidePanel = getParameterByName(out, 'panel');
 
@@ -104,13 +107,16 @@ export async function activate(context: vscode.ExtensionContext) {
 							plot_figure_02: -2,
 							make_table_04: 1,
 							plot_figure_10: 0,
-							none: 0,
+							lllllllllllllnone: 0,
+							eps_plotting_script_DeSci: -8,
+							grid_resolution_analysis_DeSci: -25,
+							'ruu - domain': 20,
 						};
 						const shiftRes = Object.keys(shiftKeys).find((k) => file.includes(k));
-						const shiftDown: number = shiftKeys[shiftRes ? shiftRes : 'none'];
-
+						const shiftDown: number = shiftKeys[shiftRes ? shiftRes : 'lllllllllllllnone'];
+						console.log('SHIFT', shiftRes, shiftDown);
 						let newLine = parseInt(line);
-						if (!shiftDown) {
+						if (shiftDown === 0) {
 							newLine -= 1;
 						} else {
 							newLine += shiftDown;
