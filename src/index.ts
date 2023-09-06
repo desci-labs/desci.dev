@@ -68,6 +68,10 @@ const resolvePlatformState = (): [Platform, string] => {
 			handler: () => window.localStorage.getItem('desci.url'),
 		},
 		{
+			id: 'desci.commands.vscode.checkCid',
+			handler: () => window.localStorage.getItem('desci.cid'),
+		},
+		{
 			id: 'desci.commands.vscode.clear',
 			handler: () => window.localStorage.setItem('desci.url', ''),
 		},

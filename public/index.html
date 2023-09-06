@@ -20,7 +20,8 @@
 							if (a?.data?.type == 'nav') {
 			// 					debugger
 			// alert(JSON.stringify(a.data));
-								localStorage.setItem('desci.url', a.data.payload.path)
+								localStorage.setItem('desci.cid', a.data.payload.cid);
+								localStorage.setItem('desci.url', a.data.payload.path);
 
 							};
 							console.log('index msg', a);

@@ -26,14 +26,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 	setInterval(async () => {
-		const out: string = await vscode.commands.executeCommand('desci.commands.vscode.check');
+		const out: string = await vscode.commands.executeCommand('desci.commands.vscode.checkCid');
+		const cid = out.split('#')[0];
 		const line = getParameterByName(out, 'line');
-		if (out !== lastUrl || line !== lastLine) {
+		if (out !== lastUrl || ((line || lastLine) && line !== lastLine)) {
 			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
 			lastLine = line || '';
 			// await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-			await vscode.commands.executeCommand('github1s.commands.vscode.replaceBrowserUrl', lastUrl);
+			// await vscode.commands.executeCommand('github1s.commands.vscode.replaceBrowserUrl', lastUrl);
 			// await vscode.commands.executeCommand('desci.commands.vscode.clear');
 
 			const path = getParameterByName(out, 'folder');
@@ -63,23 +64,19 @@ export async function activate(context: vscode.ExtensionContext) {
 				while (shouldRetry && attempts < MAX_ATTEMPTS) {
 					let uri: string = 'nouri';
 					try {
-						const a = await vscode.workspace.findFiles('*');
-						uri = `${a[a.length - 1].scheme || 'vscode-remote'}:/${a[a.length - 1].authority}${[path, file]
-							.filter(Boolean)
-							.join('/')}`;
-						const notebookUri = vscode.Uri.parse(uri);
-
-						const s = await vscode.workspace.openNotebookDocument(
-							notebookUri
-							// vscode.Uri.parse(`vscode-remote://${file}`)
-						);
+						const uri = vscode.Uri.parse(`https://ipfs.desci.com/ipfs/${cid}`);
+						// const s = await vscode.workspace.openNotebookDocument(
+						// 	uri
+						// 	// vscode.Uri.parse(`vscode-remote://${file}`)
+						// );
+						vscode.commands.executeCommand('vscode.openWith', uri, 'jupyter-notebook');
 						// let selections:vscode.NotebookRange[] = [];
 						// if (line) {
 						// let newLine = parseInt(line);
 						// const notebookRange = new vscode.NotebookRange(newLine-1, newLine);
 						// selections=[notebookRange];
 						// }
-						notebookDocument = await vscode.window.showNotebookDocument(s);
+						// notebookDocument = await vscode.window.showNotebookDocument(s);
 
 						shouldRetry = false;
 					} catch (err) {
@@ -190,15 +187,9 @@ export async function activate(context: vscode.ExtensionContext) {
 					// });
 				}
 			} else if (file) {
-				const a = await vscode.workspace.findFiles('*');
-				console.log('A', a);
-				const notebookUri = vscode.Uri.parse(
-					`${a[a.length - 1].scheme || 'vscode-remote'}:/${a[a.length - 1].authority}${[path, file]
-						.filter(Boolean)
-						.join('/')}`
-				);
+				const uri = vscode.Uri.parse(`https://ipfs.desci.com/ipfs/${cid}`);
 				const s = await vscode.workspace.openTextDocument(
-					notebookUri
+					uri
 					// vscode.Uri.parse(`vscode-remote://${file}`)
 				);
 				const st = await vscode.window.showTextDocument(s);
