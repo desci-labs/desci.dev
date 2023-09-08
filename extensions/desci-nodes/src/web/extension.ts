@@ -60,16 +60,16 @@ export async function activate(context: vscode.ExtensionContext) {
 				let shouldRetry = true;
 				const MAX_ATTEMPTS = 3;
 				let attempts = 0;
-				let notebookDocument: vscode.NotebookEditor | undefined;
 				while (shouldRetry && attempts < MAX_ATTEMPTS) {
 					let uri: string = 'nouri';
 					try {
 						const uri = vscode.Uri.parse(`https://ipfs.desci.com/ipfs/${cid}`);
+						// const msg = vscode.window.showInformationMessage(`Loading2 ${cid}`);
 						// const s = await vscode.workspace.openNotebookDocument(
 						// 	uri
 						// 	// vscode.Uri.parse(`vscode-remote://${file}`)
 						// );
-						vscode.commands.executeCommand('vscode.openWith', uri, 'jupyter-notebook');
+						await vscode.commands.executeCommand('vscode.openWith', uri, 'jupyter-notebook');
 						// let selections:vscode.NotebookRange[] = [];
 						// if (line) {
 						// let newLine = parseInt(line);
@@ -77,17 +77,19 @@ export async function activate(context: vscode.ExtensionContext) {
 						// selections=[notebookRange];
 						// }
 						// notebookDocument = await vscode.window.showNotebookDocument(s);
-
+						await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
 						shouldRetry = false;
 					} catch (err) {
 						console.error('CAUGHT');
 						console.error(err);
-						// await vscode.window.showInformationMessage(`attempt ${uri} ${attempts}: ${JSON.stringify(err)}`);
+
 						attempts++;
 					}
 				}
 
-				if (line && notebookDocument) {
+				// vscode.window.showInformationMessage(`3 l${line} s${shouldRetry} ${out}`);
+
+				if (line && !shouldRetry) {
 					// vscode.window.showInformationMessage('Loading Reproducibility');
 
 					setTimeout(async () => {
@@ -150,8 +152,8 @@ export async function activate(context: vscode.ExtensionContext) {
 							// vscode.window.showInformationMessage(
 							// 	`range: ${JSON.stringify(notebookRange)} ${JSON.stringify(notebookDocument)}`
 							// );
-							notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.InCenter);
-							notebookDocument!.selection = notebookRange;
+							// notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.InCenter);
+							// notebookDocument!.selection = notebookRange;
 							await vscode.commands.executeCommand('notebook.cell.collapseCellInput');
 							await vscode.commands.executeCommand('notebook.cell.focusInOutput');
 							// setTimeout(() => {
@@ -193,6 +195,22 @@ export async function activate(context: vscode.ExtensionContext) {
 					// vscode.Uri.parse(`vscode-remote://${file}`)
 				);
 				const st = await vscode.window.showTextDocument(s);
+
+				const ext = file.split('.').pop();
+				const langTable: { [k: string]: string } = {
+					py: 'python',
+					r: 'r',
+					R: 'r',
+					csv: 'csv',
+					txt: 'plaintext',
+					md: 'plaintext',
+					json: 'json',
+					ipynb: 'jupyter-notebook',
+				};
+
+				vscode.languages.setTextDocumentLanguage(s, langTable[ext || 'txt'] || 'plaintext');
+				await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
+
 				if (line) {
 					console.log('GOT LINE', line);
 					const newLine = parseInt(line);
