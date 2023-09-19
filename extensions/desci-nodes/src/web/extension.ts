@@ -42,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			const exec = getParameterByName(out, 'exec');
 			const sidePanel = getParameterByName(out, 'panel');
+			const isExternal = getParameterByName(out, 'external') === '1';
 
 			const isNotebook = file && file.indexOf('.ipynb') > -1;
 
@@ -189,7 +190,8 @@ export async function activate(context: vscode.ExtensionContext) {
 					// });
 				}
 			} else if (file) {
-				const uri = vscode.Uri.parse(`https://ipfs.desci.com/ipfs/${cid}`);
+				const IPFS_DOMAIN = isExternal ? 'ipfs.io' : 'ipfs.desci.com';
+				const uri = vscode.Uri.parse(`https://${IPFS_DOMAIN}/ipfs/${cid}`);
 				const s = await vscode.workspace.openTextDocument(
 					uri
 					// vscode.Uri.parse(`vscode-remote://${file}`)
