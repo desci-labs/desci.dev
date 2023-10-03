@@ -26,14 +26,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 	setInterval(async () => {
-		const out: string = await vscode.commands.executeCommand('desci.commands.vscode.check');
+		const out: string = await vscode.commands.executeCommand('desci.commands.vscode.checkCid');
+		const cid = out.split('#')[0];
 		const line = getParameterByName(out, 'line');
-		if (out !== lastUrl || line !== lastLine) {
+		if (out !== lastUrl || ((line || lastLine) && line !== lastLine)) {
 			console.log('OUT', out, 'LAST', lastUrl);
 			lastUrl = out;
 			lastLine = line || '';
 			// await vscode.commands.executeCommand('workbench.action.closeAllEditors');
-			await vscode.commands.executeCommand('github1s.commands.vscode.replaceBrowserUrl', lastUrl);
+			// await vscode.commands.executeCommand('github1s.commands.vscode.replaceBrowserUrl', lastUrl);
 			// await vscode.commands.executeCommand('desci.commands.vscode.clear');
 
 			const path = getParameterByName(out, 'folder');
@@ -41,6 +42,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			const exec = getParameterByName(out, 'exec');
 			const sidePanel = getParameterByName(out, 'panel');
+			const isExternal = getParameterByName(out, 'external') === '1';
 
 			const isNotebook = file && file.indexOf('.ipynb') > -1;
 
@@ -59,38 +61,37 @@ export async function activate(context: vscode.ExtensionContext) {
 				let shouldRetry = true;
 				const MAX_ATTEMPTS = 3;
 				let attempts = 0;
-				let notebookDocument: vscode.NotebookEditor | undefined;
 				while (shouldRetry && attempts < MAX_ATTEMPTS) {
 					let uri: string = 'nouri';
 					try {
-						const a = await vscode.workspace.findFiles('*');
-						uri = `${a[a.length - 1].scheme || 'vscode-remote'}:/${a[a.length - 1].authority}${[path, file]
-							.filter(Boolean)
-							.join('/')}`;
-						const notebookUri = vscode.Uri.parse(uri);
-
-						const s = await vscode.workspace.openNotebookDocument(
-							notebookUri
-							// vscode.Uri.parse(`vscode-remote://${file}`)
-						);
+						await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
+						const uri = vscode.Uri.parse(`https://ipfs.desci.com/ipfs/${cid}`);
+						// const msg = vscode.window.showInformationMessage(`Loading2 ${cid}`);
+						// const s = await vscode.workspace.openNotebookDocument(
+						// 	uri
+						// 	// vscode.Uri.parse(`vscode-remote://${file}`)
+						// );
+						await vscode.commands.executeCommand('vscode.openWith', uri, 'jupyter-notebook');
 						// let selections:vscode.NotebookRange[] = [];
 						// if (line) {
 						// let newLine = parseInt(line);
 						// const notebookRange = new vscode.NotebookRange(newLine-1, newLine);
 						// selections=[notebookRange];
 						// }
-						notebookDocument = await vscode.window.showNotebookDocument(s);
-
+						// notebookDocument = await vscode.window.showNotebookDocument(s);
+						await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
 						shouldRetry = false;
 					} catch (err) {
 						console.error('CAUGHT');
 						console.error(err);
-						// await vscode.window.showInformationMessage(`attempt ${uri} ${attempts}: ${JSON.stringify(err)}`);
+
 						attempts++;
 					}
 				}
 
-				if (line && notebookDocument) {
+				// vscode.window.showInformationMessage(`3 l${line} s${shouldRetry} ${out}`);
+
+				if (line && !shouldRetry) {
 					// vscode.window.showInformationMessage('Loading Reproducibility');
 
 					setTimeout(async () => {
@@ -153,8 +154,8 @@ export async function activate(context: vscode.ExtensionContext) {
 							// vscode.window.showInformationMessage(
 							// 	`range: ${JSON.stringify(notebookRange)} ${JSON.stringify(notebookDocument)}`
 							// );
-							notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.InCenter);
-							notebookDocument!.selection = notebookRange;
+							// notebookDocument!.revealRange(notebookRange, vscode.NotebookEditorRevealType.InCenter);
+							// notebookDocument!.selection = notebookRange;
 							await vscode.commands.executeCommand('notebook.cell.collapseCellInput');
 							await vscode.commands.executeCommand('notebook.cell.focusInOutput');
 							// setTimeout(() => {
@@ -190,29 +191,51 @@ export async function activate(context: vscode.ExtensionContext) {
 					// });
 				}
 			} else if (file) {
-				const a = await vscode.workspace.findFiles('*');
-				console.log('A', a);
-				const notebookUri = vscode.Uri.parse(
-					`${a[a.length - 1].scheme || 'vscode-remote'}:/${a[a.length - 1].authority}${[path, file]
-						.filter(Boolean)
-						.join('/')}`
-				);
-				const s = await vscode.workspace.openTextDocument(
-					notebookUri
-					// vscode.Uri.parse(`vscode-remote://${file}`)
-				);
-				const st = await vscode.window.showTextDocument(s);
-				if (line) {
-					console.log('GOT LINE', line);
-					const newLine = parseInt(line);
-					console.log('NEWLINE', newLine);
-					const range = new vscode.Range(new vscode.Position(newLine - 1, 0), new vscode.Position(newLine, 0));
-					const decoration = vscode.window.createTextEditorDecorationType({
-						backgroundColor: 'rgba(0, 150, 150, 0.2)',
-					});
-					st.revealRange(range);
-					console.log('range', range);
-					st.setDecorations(decoration, [range]);
+				await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
+				let tries = 0;
+				const MAX_TRIES = 3;
+				while (tries < MAX_TRIES) {
+					try {
+						const IPFS_DOMAIN = isExternal ? 'ipfs.io' : 'ipfs.desci.com';
+						const uri = vscode.Uri.parse(`https://${IPFS_DOMAIN}/ipfs/${cid}`);
+						const s = await vscode.workspace.openTextDocument(
+							uri
+							// vscode.Uri.parse(`vscode-remote://${file}`)
+						);
+						const st = await vscode.window.showTextDocument(s);
+
+						const ext = file.split('.').pop();
+						const langTable: { [k: string]: string } = {
+							py: 'python',
+							r: 'r',
+							R: 'r',
+							csv: 'csv',
+							txt: 'plaintext',
+							md: 'plaintext',
+							json: 'json',
+							ipynb: 'jupyter-notebook',
+							tex: 'tex',
+						};
+
+						vscode.languages.setTextDocumentLanguage(s, langTable[ext || 'txt'] || 'plaintext');
+						await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
+
+						if (line) {
+							console.log('GOT LINE', line);
+							const newLine = parseInt(line);
+							console.log('NEWLINE', newLine);
+							const range = new vscode.Range(new vscode.Position(newLine - 1, 0), new vscode.Position(newLine, 0));
+							const decoration = vscode.window.createTextEditorDecorationType({
+								backgroundColor: 'rgba(0, 150, 150, 0.2)',
+							});
+							st.revealRange(range);
+							console.log('range', range);
+							st.setDecorations(decoration, [range]);
+						}
+						tries = MAX_TRIES + 1;
+					} catch (err) {
+						tries += 1;
+					}
 				}
 			}
 		}
