@@ -64,6 +64,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				while (shouldRetry && attempts < MAX_ATTEMPTS) {
 					let uri: string = 'nouri';
 					try {
+						await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
 						const uri = vscode.Uri.parse(`https://ipfs.desci.com/ipfs/${cid}`);
 						// const msg = vscode.window.showInformationMessage(`Loading2 ${cid}`);
 						// const s = await vscode.workspace.openNotebookDocument(
@@ -190,40 +191,51 @@ export async function activate(context: vscode.ExtensionContext) {
 					// });
 				}
 			} else if (file) {
-				const IPFS_DOMAIN = isExternal ? 'ipfs.io' : 'ipfs.desci.com';
-				const uri = vscode.Uri.parse(`https://${IPFS_DOMAIN}/ipfs/${cid}`);
-				const s = await vscode.workspace.openTextDocument(
-					uri
-					// vscode.Uri.parse(`vscode-remote://${file}`)
-				);
-				const st = await vscode.window.showTextDocument(s);
-
-				const ext = file.split('.').pop();
-				const langTable: { [k: string]: string } = {
-					py: 'python',
-					r: 'r',
-					R: 'r',
-					csv: 'csv',
-					txt: 'plaintext',
-					md: 'plaintext',
-					json: 'json',
-					ipynb: 'jupyter-notebook',
-				};
-
-				vscode.languages.setTextDocumentLanguage(s, langTable[ext || 'txt'] || 'plaintext');
 				await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
+				let tries = 0;
+				const MAX_TRIES = 3;
+				while (tries < MAX_TRIES) {
+					try {
+						const IPFS_DOMAIN = isExternal ? 'ipfs.io' : 'ipfs.desci.com';
+						const uri = vscode.Uri.parse(`https://${IPFS_DOMAIN}/ipfs/${cid}`);
+						const s = await vscode.workspace.openTextDocument(
+							uri
+							// vscode.Uri.parse(`vscode-remote://${file}`)
+						);
+						const st = await vscode.window.showTextDocument(s);
 
-				if (line) {
-					console.log('GOT LINE', line);
-					const newLine = parseInt(line);
-					console.log('NEWLINE', newLine);
-					const range = new vscode.Range(new vscode.Position(newLine - 1, 0), new vscode.Position(newLine, 0));
-					const decoration = vscode.window.createTextEditorDecorationType({
-						backgroundColor: 'rgba(0, 150, 150, 0.2)',
-					});
-					st.revealRange(range);
-					console.log('range', range);
-					st.setDecorations(decoration, [range]);
+						const ext = file.split('.').pop();
+						const langTable: { [k: string]: string } = {
+							py: 'python',
+							r: 'r',
+							R: 'r',
+							csv: 'csv',
+							txt: 'plaintext',
+							md: 'plaintext',
+							json: 'json',
+							ipynb: 'jupyter-notebook',
+							tex: 'tex',
+						};
+
+						vscode.languages.setTextDocumentLanguage(s, langTable[ext || 'txt'] || 'plaintext');
+						await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
+
+						if (line) {
+							console.log('GOT LINE', line);
+							const newLine = parseInt(line);
+							console.log('NEWLINE', newLine);
+							const range = new vscode.Range(new vscode.Position(newLine - 1, 0), new vscode.Position(newLine, 0));
+							const decoration = vscode.window.createTextEditorDecorationType({
+								backgroundColor: 'rgba(0, 150, 150, 0.2)',
+							});
+							st.revealRange(range);
+							console.log('range', range);
+							st.setDecorations(decoration, [range]);
+						}
+						tries = MAX_TRIES + 1;
+					} catch (err) {
+						tries += 1;
+					}
 				}
 			}
 		}
