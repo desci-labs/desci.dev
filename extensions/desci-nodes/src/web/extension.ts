@@ -28,7 +28,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	setInterval(async () => {
 		const out: string = await vscode.commands.executeCommand('desci.commands.vscode.checkCid');
-		const cid = out.split('#')[0];
+		const cid = out ? out.split('#')[0] : null;
 		const line = getParameterByName(out, 'line');
 		if (out !== lastUrl || ((line || lastLine) && line !== lastLine && !busy)) {
 			try {
