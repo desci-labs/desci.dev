@@ -13,6 +13,10 @@ export async function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "desci-nodes" is now active in the web extension host!');
 
+	const origin: string = await vscode.commands.executeCommand('github1s.commands.vscode.getBrowserOrigin');
+
+	const DEFAULT_IPFS_DOMAIN = origin === 'http://localhost:5000' ? 'http://localhost:8089' : 'https://ipfs.desci.com';
+	console.log('DEFAULT_IPFS_DOMAIN', DEFAULT_IPFS_DOMAIN, origin);
 	function getParameterByName(url: string, name: string) {
 		name = name.replace(/[\[\]]/g, '\\$&');
 		var regex = new RegExp('[?&#]' + name + '(=([^&#]*)|&|#|$)'),
@@ -73,7 +77,7 @@ export async function activate(context: vscode.ExtensionContext) {
 						let uri: string = 'nouri';
 						try {
 							await vscode.commands.executeCommand('workbench.action.closeOtherEditors');
-							const uri = vscode.Uri.parse(`https://ipfs.desci.com/ipfs/${cid}`);
+							const uri = vscode.Uri.parse(`${DEFAULT_IPFS_DOMAIN}/ipfs/${cid}`);
 							// const msg = vscode.window.showInformationMessage(`Loading2 ${cid}`);
 							// const s = await vscode.workspace.openNotebookDocument(
 							// 	uri
@@ -204,8 +208,8 @@ export async function activate(context: vscode.ExtensionContext) {
 					const MAX_TRIES = 3;
 					while (tries < MAX_TRIES) {
 						try {
-							const IPFS_DOMAIN = isExternal ? 'ipfs.io' : 'ipfs.desci.com';
-							const uri = vscode.Uri.parse(`https://${IPFS_DOMAIN}/ipfs/${cid}`);
+							const IPFS_DOMAIN = isExternal ? 'https://ipfs.io' : DEFAULT_IPFS_DOMAIN;
+							const uri = vscode.Uri.parse(`${IPFS_DOMAIN}/ipfs/${cid}`);
 							const s = await vscode.workspace.openTextDocument(
 								uri
 								// vscode.Uri.parse(`vscode-remote://${file}`)

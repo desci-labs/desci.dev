@@ -59,6 +59,7 @@ const resolvePlatformState = (): [Platform, string] => {
 	}
 
 	const vscodeCommands = [
+		{ id: 'github1s.commands.vscode.getBrowserOrigin', handler: () => window.origin },
 		{ id: 'github1s.commands.vscode.getBrowserUrl', handler: () => window.location.href },
 		{ id: 'github1s.commands.vscode.replaceBrowserUrl', handler: (url: string) => history.replaceState(null, '', url) },
 		{ id: 'github1s.commands.vscode.pushBrowserUrl', handler: (url: string) => history.pushState(null, '', url) },
