@@ -115,3 +115,7 @@
 .label-container {
 	visibility: hidden !important;
 }
+
+.editor-group-watermark {
+	opacity: 0;
+}
