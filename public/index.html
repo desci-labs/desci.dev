@@ -16,21 +16,29 @@
 		<link rel="manifest" href="/manifest.json" />
 		<title>DeSci Labs</title>
 		<script>
-						window.addEventListener('message', (a) => {
-							if (a?.data?.type == 'nav') {
-			// 					debugger
-			// alert(JSON.stringify(a.data));
-								localStorage.setItem('desci.cid', a.data.payload.cid);
-								localStorage.setItem('desci.url', a.data.payload.path);
+						// check every 200ms to see if element is visible, if not visible after 3s refresh
+			let count = 0;
+			const interval = setInterval(function () {
+				count++;
+				if (document.getElementById('workbench.parts.statusbar')?.checkVisibility()) {
+					clearInterval(interval);
+				} else if (count > 15) {
+					clearInterval(interval);
+					window.location.reload();
+				}
+			}, 200);
+							window.addEventListener('message', (a) => {
+								if (a?.data?.type == 'nav') {
+				// 					debugger
+				// alert(JSON.stringify(a.data));
+									localStorage.setItem('desci.cid', a.data.payload.cid);
+									localStorage.setItem('desci.url', a.data.payload.path);
 
-							};
-							console.log('index msg', a);
-						});
-						setTimeout(() => {
-							// debugger
-							window.postMessage({a:1, file:'index.html'});
-						}, 5000);
-						<%= pageTitleScript %>
+								};
+								console.log('index msg', a);
+							});
+
+							<%= pageTitleScript %>
 		</script>
 		<script>
 			<%= analyticsScript %>
