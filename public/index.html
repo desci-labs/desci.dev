@@ -19,13 +19,16 @@
 						// check every 200ms to see if element is visible, if not visible after 3s refresh
 			let count = 0;
 			const interval = setInterval(function () {
+				// check if window focused
+
 				count++;
 				if (document.getElementById('workbench.parts.statusbar')?.checkVisibility()) {
 					clearInterval(interval);
 				} else if (count > 15) {
 					clearInterval(interval);
-					window.location.reload();
+					window.parent.postMessage({ type: 'vscode:refresh' }, '*')
 				}
+
 			}, 200);
 							window.addEventListener('message', (a) => {
 								if (a?.data?.type == 'nav') {
